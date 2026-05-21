@@ -1,171 +1,206 @@
 "use client";
 
-/**
- * /map – Campus Map page
- * Uses Leaflet (free, open-source) for interactive map rendering.
- * Install: npm i leaflet @types/leaflet react-leaflet
- */
+import { useState } from "react";
+import Link from "next/link";
+import { NTU_BUILDINGS, CATEGORY_CONFIG } from "@/lib/static-buildings";
+import type { Building } from "@/types";
 
-import { useEffect, useRef, useState } from "react";
-import { buildingsApi, navigationApi } from "@/lib/api";
-import { formatDistance, formatDuration, CATEGORY_EMOJI } from "@/lib/utils";
-import type { Building, NavigationResponse, TravelMode } from "@/types";
-
-const MODE_LABELS: Record<TravelMode, string> = {
-  walking: "🚶 Walk",
-  cycling: "🚲 Cycle",
-  shuttle: "🚌 Shuttle",
-};
+const CATEGORIES = ["all", "academic", "hub", "library", "sports", "transport", "residence"];
 
 export default function MapPage() {
-  const [buildings, setBuildings] = useState<Building[]>([]);
-  const [selected, setSelected] = useState<Building | null>(null);
-  const [origin, setOrigin] = useState<Building | null>(null);
-  const [destination, setDestination] = useState<Building | null>(null);
-  const [mode, setMode] = useState<TravelMode>("walking");
-  const [route, setRoute] = useState<NavigationResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch]       = useState("");
+  const [category, setCategory]   = useState("all");
+  const [selected, setSelected]   = useState<Building | null>(null);
+  const [origin, setOrigin]       = useState<Building | null>(null);
+  const [destination, setDest]    = useState<Building | null>(null);
 
-  const filtered = buildings.filter(
-    (b) =>
+  const filtered = NTU_BUILDINGS.filter((b) => {
+    const matchesSearch =
       b.name.toLowerCase().includes(search.toLowerCase()) ||
-      b.code.toLowerCase().includes(search.toLowerCase())
-  );
-
-  useEffect(() => {
-    buildingsApi.list().then(setBuildings).catch(console.error);
-  }, []);
-
-  const handleRoute = async () => {
-    if (!origin || !destination) return;
-    setLoading(true);
-    try {
-      const result = await navigationApi.getRoute(origin.id, destination.id, mode);
-      setRoute(result);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+      b.code.toLowerCase().includes(search.toLowerCase()) ||
+      (b.short_name ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchesCat = category === "all" || b.category === category;
+    return matchesSearch && matchesCat;
+  });
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* Navbar */}
-      <nav className="flex items-center gap-4 border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
-        <a href="/" className="text-xl font-bold text-red-700">🎓 CampusMind AI</a>
-        <span className="ml-auto text-sm text-gray-400">NTU Campus Map</span>
+    <div className="flex h-screen flex-col bg-gray-950">
+      {/* ── Navbar ── */}
+      <nav className="flex items-center gap-4 border-b border-gray-800 bg-gray-950 px-4 py-3 shadow-lg">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl">🎓</span>
+          <span className="font-bold text-white text-lg">Campus<span className="text-red-500">Mind</span></span>
+        </Link>
+        <div className="flex gap-1 ml-6">
+          {["Map", "Assistant", "Schedule"].map((label) => (
+            <Link key={label} href={`/${label.toLowerCase()}`}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                label === "Map"
+                  ? "bg-red-600 text-white"
+                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+              }`}>
+              {label}
+            </Link>
+          ))}
+        </div>
+        <span className="ml-auto text-xs text-gray-500">{NTU_BUILDINGS.length} locations loaded</span>
       </nav>
 
       <div className="flex flex-1 overflow-hidden">
         {/* ── Sidebar ── */}
-        <aside className="flex w-80 flex-col gap-4 overflow-y-auto border-r border-gray-200 bg-white p-4">
-          {/* Search */}
-          <input
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-red-400 focus:outline-none"
-            placeholder="Search buildings…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <aside className="flex w-80 flex-col gap-3 overflow-y-auto border-r border-gray-800 bg-gray-900 p-4">
 
-          {/* Route planner */}
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 flex flex-col gap-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Route Planner</p>
-            <select
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              value={origin?.id ?? ""}
-              onChange={(e) => setOrigin(buildings.find((b) => b.id === +e.target.value) ?? null)}
-            >
-              <option value="">From…</option>
-              {buildings.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-            <select
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              value={destination?.id ?? ""}
-              onChange={(e) => setDestination(buildings.find((b) => b.id === +e.target.value) ?? null)}
-            >
-              <option value="">To…</option>
-              {buildings.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-            <div className="flex gap-1">
-              {(Object.keys(MODE_LABELS) as TravelMode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition ${
-                    mode === m ? "bg-red-600 text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                  }`}
-                >
-                  {MODE_LABELS[m]}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={handleRoute}
-              disabled={!origin || !destination || loading}
-              className="rounded-lg bg-red-600 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition"
-            >
-              {loading ? "Calculating…" : "Get Directions"}
-            </button>
+          {/* Search */}
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+            <input
+              className="w-full rounded-xl border border-gray-700 bg-gray-800 pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition"
+              placeholder="Search buildings, codes…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
 
-          {/* Route result */}
-          {route && (
-            <div className="rounded-xl border border-green-200 bg-green-50 p-3 flex flex-col gap-1">
-              <p className="text-sm font-semibold text-green-800">
-                {formatDistance(route.total_distance_m)} · {formatDuration(route.estimated_minutes)}
-              </p>
-              <ul className="mt-1 flex flex-col gap-1">
-                {route.steps.map((s, i) => (
-                  <li key={i} className="text-xs text-gray-600">
-                    {i + 1}. {s.instruction} ({formatDistance(s.distance_m)})
-                  </li>
-                ))}
-              </ul>
+          {/* Category filter */}
+          <div className="flex flex-wrap gap-1.5">
+            {CATEGORIES.map((cat) => (
+              <button key={cat} onClick={() => setCategory(cat)}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
+                  category === cat
+                    ? "bg-red-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                }`}>
+                {cat === "all" ? "All" : (CATEGORY_CONFIG[cat]?.emoji ?? "") + " " + cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Route planner */}
+          <div className="rounded-2xl border border-gray-700 bg-gray-800 p-4 flex flex-col gap-3">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">🧭 Route Planner</p>
+
+            <select className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+              value={origin?.id ?? ""}
+              onChange={(e) => setOrigin(NTU_BUILDINGS.find((b) => b.id === +e.target.value) ?? null)}>
+              <option value="">From…</option>
+              {NTU_BUILDINGS.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+
+            <select className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+              value={destination?.id ?? ""}
+              onChange={(e) => setDest(NTU_BUILDINGS.find((b) => b.id === +e.target.value) ?? null)}>
+              <option value="">To…</option>
+              {NTU_BUILDINGS.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+
+            {origin && destination && origin.id !== destination.id ? (
+              <div className="rounded-xl border border-emerald-700 bg-emerald-950 p-3 text-sm text-emerald-300">
+                <p className="font-semibold">✅ Route Ready</p>
+                <p className="text-xs mt-1 text-emerald-400">{origin.short_name ?? origin.name} → {destination.short_name ?? destination.name}</p>
+                <p className="text-xs mt-1 text-gray-400">Full A* routing available with backend running locally.</p>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500 text-center">Select an origin and destination above</p>
+            )}
+          </div>
+
+          {/* Results count */}
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {filtered.length} location{filtered.length !== 1 ? "s" : ""}
+          </p>
+
+          {/* Building list */}
+          <div className="flex flex-col gap-2">
+            {filtered.map((b) => {
+              const cfg = CATEGORY_CONFIG[b.category] ?? { emoji: "📍", color: "text-gray-400", bg: "" };
+              const isSelected = selected?.id === b.id;
+              return (
+                <button key={b.id} onClick={() => setSelected(isSelected ? null : b)}
+                  className={`flex items-start gap-3 rounded-xl border p-3 text-left transition-all ${
+                    isSelected
+                      ? "border-red-500 bg-red-950"
+                      : "border-gray-700 bg-gray-800 hover:border-gray-600 hover:bg-gray-750"
+                  }`}>
+                  <span className="text-xl mt-0.5">{cfg.emoji}</span>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-white truncate">{b.name}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{b.code} · {b.category}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+
+        {/* ── Map area ── */}
+        <main className="relative flex-1 bg-gray-950 overflow-hidden">
+          {/* Fake map grid */}
+          <div className="absolute inset-0 opacity-5"
+            style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+
+          {/* Decorative campus paths */}
+          <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20%" y1="50%" x2="80%" y2="50%" stroke="#ef4444" strokeWidth="2" strokeDasharray="8 4"/>
+            <line x1="50%" y1="10%" x2="50%" y2="90%" stroke="#ef4444" strokeWidth="2" strokeDasharray="8 4"/>
+            <circle cx="50%" cy="50%" r="80" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeDasharray="6 4"/>
+          </svg>
+
+          {/* Building dots on mock map */}
+          {NTU_BUILDINGS.map((b) => {
+            const cfg = CATEGORY_CONFIG[b.category];
+            const x = ((b.longitude - 103.676) / 0.012) * 100;
+            const y = ((1.352 - b.latitude) / 0.012) * 100;
+            const isSelected = selected?.id === b.id;
+            return (
+              <button key={b.id} onClick={() => setSelected(isSelected ? null : b)}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-transform hover:scale-125"
+                style={{ left: `${x}%`, top: `${y}%` }}>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 shadow-lg transition-all ${
+                  isSelected ? "border-red-400 bg-red-600 scale-125" : "border-gray-600 bg-gray-800 hover:border-red-400"
+                }`}>
+                  <span className="text-base">{cfg?.emoji ?? "📍"}</span>
+                </div>
+                {isSelected && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-gray-900 shadow-xl">
+                    {b.short_name ?? b.name}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+
+          {/* Selected building card */}
+          {selected && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-80 rounded-2xl border border-gray-700 bg-gray-900/95 backdrop-blur-sm shadow-2xl p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-lg font-bold text-white leading-snug">{selected.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{selected.code} · {selected.category}</p>
+                </div>
+                <button onClick={() => setSelected(null)} className="text-gray-600 hover:text-white transition text-xl leading-none">✕</button>
+              </div>
+              <p className="mt-3 text-sm text-gray-400 leading-relaxed">{selected.description}</p>
+              <div className="mt-3 flex gap-2">
+                <button onClick={() => setOrigin(selected)}
+                  className="flex-1 rounded-lg bg-gray-800 py-2 text-xs font-semibold text-gray-300 hover:bg-gray-700 transition">
+                  Set as Origin
+                </button>
+                <button onClick={() => setDest(selected)}
+                  className="flex-1 rounded-lg bg-red-600 py-2 text-xs font-semibold text-white hover:bg-red-700 transition">
+                  Set as Destination
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Building list */}
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            {filtered.length} locations
-          </p>
-          {filtered.map((b) => (
-            <button
-              key={b.id}
-              onClick={() => setSelected(b)}
-              className={`flex items-start gap-2 rounded-xl border p-3 text-left text-sm transition hover:border-red-300 hover:bg-red-50 ${
-                selected?.id === b.id ? "border-red-400 bg-red-50" : "border-gray-200 bg-white"
-              }`}
-            >
-              <span className="text-xl">{CATEGORY_EMOJI[b.category] ?? "📍"}</span>
-              <div>
-                <p className="font-semibold">{b.name}</p>
-                <p className="text-xs text-gray-400">{b.code} · {b.category}</p>
-              </div>
-            </button>
-          ))}
-        </aside>
+          {/* Map label */}
+          <div className="absolute top-4 right-4 rounded-xl border border-gray-700 bg-gray-900/80 backdrop-blur-sm px-3 py-2 text-xs text-gray-400">
+            📍 NTU Campus · Singapore
+          </div>
 
-        {/* ── Map placeholder (replace with Leaflet/react-leaflet component) ── */}
-        <main className="relative flex-1 bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <p className="text-5xl">🗺️</p>
-            <p className="mt-3 font-semibold text-gray-500">Interactive Map</p>
-            <p className="text-sm">
-              Install <code className="rounded bg-gray-200 px-1">react-leaflet</code> and drop in the{" "}
-              <code className="rounded bg-gray-200 px-1">MapView</code> component
-            </p>
-            {selected && (
-              <div className="mt-4 rounded-xl border border-emerald-200 bg-white p-4 shadow text-left max-w-xs mx-auto">
-                <p className="text-lg font-bold">{CATEGORY_EMOJI[selected.category]} {selected.name}</p>
-                <p className="text-xs text-gray-400 mb-1">{selected.code}</p>
-                <p className="text-sm text-gray-600">{selected.description}</p>
-                <p className="mt-2 text-xs text-gray-400">
-                  📍 {selected.latitude.toFixed(4)}, {selected.longitude.toFixed(4)}
-                </p>
-              </div>
-            )}
+          {/* Install Leaflet hint */}
+          <div className="absolute top-4 left-4 rounded-xl border border-amber-800 bg-amber-950/80 backdrop-blur-sm px-3 py-2 text-xs text-amber-300 max-w-xs">
+            💡 Full interactive map: install <code className="font-mono">react-leaflet</code>
           </div>
         </main>
       </div>
