@@ -26,10 +26,10 @@ function getStaticResponse(message: string): string {
     return "🏠 **Hall of Residence 1** is one of NTU's oldest halls, located in the northwest residential area near North Hill. It's served by **Shuttle Route A**. Known for its strong inter-hall games tradition.";
   if (q.match(/hall\s*(16|sixteen)\b/) || q.includes("hall 16"))
     return "🏠 **Hall of Residence 16** is one of NTU's newest halls with fully air-conditioned en-suite rooms. Located in the southwest residential area. Great facilities and an active hall culture.";
-  if (q.includes("residential college") || q.includes(" rc ") || q.includes("pioneer rc") || q.includes("nanyang rc"))
-    return "🏠 NTU has **5 Residential Colleges (RCs)**:\n• **Pioneer House** — leadership & sustainability\n• **Nanyang House** — East-West dialogue\n• **Binjai Hall** — innovation & tech\n• **Tanjong Hall** — arts & service learning\n• **Palm Villa** — global citizenship\n\nRCs offer a 4-year living-learning programme with special curriculum.";
+  if (q.includes("residential college") || q.includes("named hall") || q.includes("crescent") || q.includes("banyan") || q.includes("saraca") || q.includes("tamarind") || q.includes("pioneer hall") || q.includes("binjai") || q.includes("tanjong"))
+    return "🏠 NTU has **7 named halls** along Nanyang Crescent, all part of the **RE@NTU** (Residential Education) programme:\n• **Crescent Hall** — opened 2014\n• **Pioneer Hall** — opened 2014, houses CN Yang Scholars, USP & LKCMed students\n• **Binjai Hall** — opened 2016, houses REP, TAISP & NGL students\n• **Tanjong Hall** — opened 2016\n• **Banyan Hall** — opened 2016\n• **Saraca Hall** — opened 2017\n• **Tamarind Hall** — opened 2017\n\nAll are located along Nanyang Crescent on the north side of campus.";
   if (q.includes("hall") || q.includes("hostel") || q.includes("residence") || q.includes("dorm"))
-    return "🏠 NTU has **16 Halls of Residence** (Hall 1–16) plus **6 Residential Colleges** (Pioneer, Nanyang, Camellia, Binjai, Tanjong, Palm).\n\nHalls 1–6 are on the northwest (North Hill area), Halls 7–12 are near the Sports Hall, and Halls 13–16 are on the southwest side. All are served by shuttle buses from the North Bus Terminal.";
+    return "🏠 NTU has **23 halls of residence** in total:\n\n**16 numbered halls** (Hall 1–16) on North Hill:\n— Halls 1–7 are older, Halls 8–16 are newer with air-conditioning\n\n**7 named halls** along Nanyang Crescent (RE@NTU programme):\n— Crescent, Pioneer, Binjai, Tanjong, Banyan, Saraca, Tamarind\n\nAll halls are served by shuttle buses from the North Bus Terminal. Use the **NTU Campus Rider app** for live bus timings.";
 
   // Libraries
   if (q.includes("library") || q.includes("lwn") || q.includes("study"))
