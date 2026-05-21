@@ -1,0 +1,122 @@
+[
+  {
+    "code": "NS1",
+    "name": "The Hive (Learning Hub)",
+    "short_name": "Hive",
+    "description": "Iconic 12-storey beehive structure housing collaborative learning spaces, tutorial rooms, and studios.",
+    "category": "academic",
+    "latitude": 1.3455,
+    "longitude": 103.6820,
+    "metadata_json": {"floors": 12, "facilities": ["collaborative rooms", "study pods", "cafe"]}
+  },
+  {
+    "code": "NS2",
+    "name": "North Spine Plaza",
+    "short_name": "North Spine",
+    "description": "Main north campus spine connecting academic buildings with canteens and admin offices.",
+    "category": "hub",
+    "latitude": 1.3483,
+    "longitude": 103.6831,
+    "metadata_json": {"canteens": ["Canteen 1", "Canteen 2"], "atm": true}
+  },
+  {
+    "code": "SS2",
+    "name": "South Spine",
+    "short_name": "South Spine",
+    "description": "South campus connector with canteens, Co-op, and student services.",
+    "category": "hub",
+    "latitude": 1.3415,
+    "longitude": 103.6815,
+    "metadata_json": {"canteens": ["Canteen 9", "Canteen 11"], "coop": true}
+  },
+  {
+    "code": "LWN",
+    "name": "Lee Wee Nam Library",
+    "short_name": "LWN Library",
+    "description": "Main NTU library with 24/7 study areas, digital resources, and maker spaces.",
+    "category": "library",
+    "latitude": 1.3474,
+    "longitude": 103.6810,
+    "metadata_json": {"floors": 5, "24h_zone": true, "facilities": ["study rooms", "makerspace", "printing"]}
+  },
+  {
+    "code": "ADM",
+    "name": "School of Art, Design & Media",
+    "short_name": "ADM",
+    "description": "Curved green-roofed building housing art, design, and media programmes.",
+    "category": "academic",
+    "latitude": 1.3480,
+    "longitude": 103.6800,
+    "metadata_json": {"school": "ADM", "facilities": ["studios", "gallery", "digital lab"]}
+  },
+  {
+    "code": "SBS",
+    "name": "School of Biological Sciences",
+    "short_name": "SBS",
+    "description": "Biological sciences research and teaching facility.",
+    "category": "academic",
+    "latitude": 1.3460,
+    "longitude": 103.6845,
+    "metadata_json": {"school": "SBS"}
+  },
+  {
+    "code": "SPMS",
+    "name": "School of Physical & Mathematical Sciences",
+    "short_name": "SPMS",
+    "description": "Houses the departments of Mathematics, Physics, and Chemistry.",
+    "category": "academic",
+    "latitude": 1.3465,
+    "longitude": 103.6838,
+    "metadata_json": {"school": "SPMS"}
+  },
+  {
+    "code": "SH",
+    "name": "Sports Hall",
+    "short_name": "Sports Hall",
+    "description": "Indoor sports complex with badminton, basketball, squash, and gym facilities.",
+    "category": "sports",
+    "latitude": 1.3490,
+    "longitude": 103.6780,
+    "metadata_json": {"facilities": ["badminton", "basketball", "squash", "gym", "swimming pool"]}
+  },
+  {
+    "code": "BUS-N",
+    "name": "Shuttle Bus Stop – North",
+    "short_name": "Bus North",
+    "description": "North campus shuttle bus terminus. Routes A, B, C depart here.",
+    "category": "transport",
+    "latitude": 1.3495,
+    "longitude": 103.6835,
+    "metadata_json": {"routes": ["A", "B", "C"], "type": "terminus"}
+  },
+  {
+    "code": "BUS-S",
+    "name": "Shuttle Bus Stop – South",
+    "short_name": "Bus South",
+    "description": "South campus shuttle bus stop. Route D loop.",
+    "category": "transport",
+    "latitude": 1.3410,
+    "longitude": 103.6820,
+    "metadata_json": {"routes": ["D"], "type": "stop"}
+  },
+  {
+    "code": "HALL1",
+    "name": "Hall of Residence 1",
+    "short_name": "Hall 1",
+    "description": "Residential hall on the west side of campus.",
+    "category": "residence",
+    "latitude": 1.3500,
+    "longitude": 103.6795,
+    "metadata_json": {"units": 500}
+  },
+  {
+    "code": "CEE",
+    "name": "School of Civil & Environmental Engineering",
+    "short_name": "CEE",
+    "description": "Civil, environmental, and geomatics engineering department.",
+    "category": "academic",
+    "latitude": 1.3470,
+    "longitude": 103.6855,
+    "metadata_json": {"school": "CEE"}
+  }
+]

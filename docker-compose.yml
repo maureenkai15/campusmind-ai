@@ -1,0 +1,48 @@
+version: "3.9"
+
+# CampusMind AI – Local development stack (all free/open-source)
+# Usage: docker compose up --build
+
+services:
+  # ── FastAPI Backend ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/campusmind.db
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  # ── Next.js Frontend ────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env.local
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Ollama (local LLM – no API key needed) ──────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    # To pull a model: docker exec campusmind-ollama-1 ollama pull llama3.2
+
+volumes:
+  backend_data:
+  ollama_models:
