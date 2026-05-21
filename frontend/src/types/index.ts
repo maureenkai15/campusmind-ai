@@ -8,6 +8,7 @@ export type BuildingCategory =
   | "library"
   | "residence"
   | "transport"
+  | "medical"
   | "hub";
 
 export interface Building {
