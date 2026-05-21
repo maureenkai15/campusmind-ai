@@ -27,7 +27,7 @@ function getStaticResponse(message: string): string {
   if (q.match(/hall\s*(16|sixteen)\b/) || q.includes("hall 16"))
     return "🏠 **Hall of Residence 16** is one of NTU's newest halls with fully air-conditioned en-suite rooms. Located in the southwest residential area. Great facilities and an active hall culture.";
   if (q.includes("residential college") || q.includes(" rc ") || q.includes("pioneer rc") || q.includes("nanyang rc"))
-    return "🏠 NTU has **6 Residential Colleges (RCs)**:\n• **Pioneer House** — leadership & sustainability\n• **Nanyang House** — East-West dialogue\n• **Camellia Hall** — wellness & Asian heritage\n• **Binjai Hall** — innovation & tech\n• **Tanjong Hall** — arts & service learning\n• **Palm Hall** — global citizenship\n\nRCs offer a 4-year living-learning programme with special curriculum.";
+    return "🏠 NTU has **5 Residential Colleges (RCs)**:\n• **Pioneer House** — leadership & sustainability\n• **Nanyang House** — East-West dialogue\n• **Binjai Hall** — innovation & tech\n• **Tanjong Hall** — arts & service learning\n• **Palm Villa** — global citizenship\n\nRCs offer a 4-year living-learning programme with special curriculum.";
   if (q.includes("hall") || q.includes("hostel") || q.includes("residence") || q.includes("dorm"))
     return "🏠 NTU has **16 Halls of Residence** (Hall 1–16) plus **6 Residential Colleges** (Pioneer, Nanyang, Camellia, Binjai, Tanjong, Palm).\n\nHalls 1–6 are on the northwest (North Hill area), Halls 7–12 are near the Sports Hall, and Halls 13–16 are on the southwest side. All are served by shuttle buses from the North Bus Terminal.";
 
